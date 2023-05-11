@@ -10,7 +10,7 @@ hello world
 
 becomes
 
-`<button class="" i18n="@@FMW_FILENAME_HELLOWORLD">
+`<button class="" i18n="@@ANGULAR_FILENAME_HELLOWORLD">
 hello world
 </button>`
 
@@ -18,7 +18,7 @@ hello world
 
 becomes 
 
-`<input placeholder="test" i18n-placeholder="FMW_FILENAME_TEST">`
+`<input placeholder="test" i18n-placeholder="ANGULAR_FILENAME_TEST">`
 
 
 

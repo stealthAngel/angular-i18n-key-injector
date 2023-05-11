@@ -6,7 +6,7 @@ var data = require('./data/translateable-attributes');
 var TRANSLATEABLE_ATTRIBUTES = data.translateableAttributes;
 
 let CURRENT_FILENAME = '';
-let PREFIX_I18N_NAME = 'FM_';
+let PREFIX_I18N_NAME = 'ANGULAR_';
 
 function setLocalFileName(editor) {
   let filePath = editor.document.fileName;

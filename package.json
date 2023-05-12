@@ -1,7 +1,7 @@
 {
-  "name": "vs-code-angular-i18n-key-injector",
-  "displayName": "vs-code-angular-i18n-key-injector",
-  "publisher": "Drunken Wizard",
+  "name": "angular-i18n-key-injector",
+  "displayName": "angular-i18n-key-injector",
+  "publisher": "DrunkenWizard",
   "description": "",
   "icon": "images/icon3.png",
   "version": "1.0.0",
@@ -12,13 +12,13 @@
     "Other"
   ],
   "activationEvents": [
-    "onCommand:vs-code-angular-i18n-key-injector.createi18n"
+    "onCommand:angular-i18n-key-injector.createi18n"
   ],
   "main": "./extension.js",
   "contributes": {
     "commands": [
       {
-        "command": "vs-code-angular-i18n-key-injector.createi18n",
+        "command": "angular-i18n-key-injector.createi18n",
         "title": "createi18n"
       }
     ]
@@ -28,10 +28,13 @@
     "pretest": "npm run lint",
     "test": "node ./test/runTest.js",
     "package": "vsce package",
-    "install-package": "code --install-extension vs-code-angular-i18n-key-injector-1.0.1.vsix",
+    "install-package": "code --install-extension angular-i18n-key-injector-1.0.1.vsix",
     "p": "npm run package",
     "ip": "npm run install-package"
-
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/stealthAngel/angular-i18n-key-injector"
   },
   "devDependencies": {
     "@types/glob": "^8.0.0",

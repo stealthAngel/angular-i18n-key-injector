@@ -131,7 +131,7 @@ function stringToi18nTextOrEmpty(arg1) {
  */
 function activate(context) {
 
-  let disposable2 = vscode.commands.registerCommand('vs-code-angular-i18n-key-injector.createi18n', function() {
+  let disposable2 = vscode.commands.registerCommand('angular-i18n-key-injector.createi18n', function() {
 
     //set local editor
     var editor = vscode.window.activeTextEditor;

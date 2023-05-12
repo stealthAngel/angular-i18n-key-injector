@@ -1,10 +1,10 @@
 {
   "name": "vs-code-angular-i18n-key-injector",
   "displayName": "vs-code-angular-i18n-key-injector",
-  "publisher": "Reflex Blue team",
+  "publisher": "Drunken Wizard",
   "description": "",
   "icon": "images/icon3.png",
-  "version": "1.0.1",
+  "version": "1.0.0",
   "engines": {
     "vscode": "^1.71.0"
   },

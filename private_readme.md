@@ -1,3 +1,8 @@
+quickstart:
+
+run `npm i`
+
+
 to make package out of this:
 
 `vsce package `

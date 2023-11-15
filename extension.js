@@ -1,166 +1,127 @@
-// The module 'vscode' contains the VS Code extensibility API
-// Import the module and reference it with the alias vscode in your code below
-const vscode = require('vscode');
-var HTMLParser = require('node-html-parser');
-var data = require('./data/translateable-attributes');
-var TRANSLATEABLE_ATTRIBUTES = data.translateableAttributes;
+  const vscode = require('vscode');
+  const HTMLParser = require('node-html-parser');
+  const data = require('./data/translateable-attributes');
 
-let CURRENT_FILENAME = '';
-let PREFIX_I18N_NAME = 'ANGULAR_';
+  const TRANSLATEABLE_ATTRIBUTES = data.TRANSLATEABLE_ATTRIBUTES; //will add for attributes e.g alt="myimagename" alt-i18n="prefix.filename.etc"
+  const PREFIX_I18N_NAME = data.PREFIX_I18N_NAME;
 
-function setLocalFileName(editor) {
-  let filePath = editor.document.fileName;
-
-  let fileNameWithoutPath = filePath.split('\\').pop().split('/').pop();
-  // remove file extension, remove . and -, convert to uppercase
-  CURRENT_FILENAME = fileNameWithoutPath.split('.').shift().replace(/[-.]/g, '').toUpperCase();
-}
-
-function getAllTextNodes(node) {
-  var listOfNodes = [];
-  if (node) {
-    for (var i = 0; i < node.childNodes.length; i++) {
-      var childNode = node.childNodes[i];
-      if (childNode.rawText.toString().trim() !== "" && childNode.nodeType == 3) {
-        listOfNodes[listOfNodes.length] = childNode;
-      } else {
-        listOfNodes = listOfNodes.concat(getAllTextNodes(childNode));
-      }
-    }
+  function getFileNameWithoutExtension(filePath) {
+      return filePath.split(/[/\\]/).pop().split('.').shift();
   }
-  return listOfNodes;
-}
 
-function translateElementTexts(document) {
+  function formatFileName(fileName) {
+    // Replace non-letter and non-number characters with empty string
+    // and convert to uppercase
+    return fileName.replace(/[^a-zA-Z0-9]/g, '').toUpperCase();
+  }
 
-  var listOfNodes = getAllTextNodes(document);
-  
-  listOfNodes.forEach(function(node) {
-    var i18nText = stringToi18nTextOrEmpty(node.rawText);
+  function getAllTextNodes(node) {
+      if (!node) return [];
 
-    if (i18nText === '') {
-      return;
-    }
+      return node.childNodes.reduce((listOfNodes, childNode) => {
+          if (childNode.nodeType === 3 && childNode.rawText.trim()) {
+              listOfNodes.push(childNode);
+          } else {
+              listOfNodes.push(...getAllTextNodes(childNode));
+          }
+          return listOfNodes;
+      }, []);
+  }
 
-    //if the parent contains more childs with translations replace the current one with ng container
-    if (node.parentNode.childNodes.length > 1) {
-      var element = HTMLParser.parse(`<ng-container i18n="${i18nText}">${node.rawText}</ng-container>`);
-      node.parentNode.exchangeChild(node, element);
-    } else {
-      //remove all i18n attributes
-      node.parentNode.rawAttrs = node.parentNode.rawAttrs.replace(/i18n="[^"]*"/g, '');
-      //remove all spaces after
-      node.parentNode.rawAttrs = node.parentNode.rawAttrs.trim();
-      //solves double space issue if there are no attributes
-      if(node.parentNode.rawAttrs === ''){
-        node.parentNode.rawAttrs = `i18n="${i18nText}"`;
-      }else{
-        node.parentNode.rawAttrs += ` i18n="${i18nText}"`;
-      }
-    }
-  });
-}
+  function stringToi18nTextOrEmpty(text, CURRENT_FILENAME) {
+      if (typeof text === 'undefined') return '';
 
-function translateAttributes(document) {
-  document.querySelectorAll('*').forEach((function(node) {
-    TRANSLATEABLE_ATTRIBUTES.forEach(attr => {
+      text = text.replace(/(\r\n|\n|\r)/gm, "")
+          .replace(/{{[^}]*}}/g, '')
+          .replace(/[.\-'",:;?!()[\]{}\/\\|&*^%$#@+=~`]/g, '')
+          .trim()
+          .toUpperCase()
+          .replace(/ /g, '')
+          .substring(0, 50);
 
-      var attrToFind = attr + '=';
+      return text ? `@@${PREFIX_I18N_NAME}${CURRENT_FILENAME}_${text}` : '';
+  }
 
-      if (node.rawAttrs.includes(attrToFind)) {
+  function translateElementTexts(document, CURRENT_FILENAME) {
+      const listOfNodes = getAllTextNodes(document);
 
-        var attrString = node.getAttribute(attr);
-
-        var text = stringToi18nTextOrEmpty(attrString);
-        if (text === '') {
+      listOfNodes.forEach(node => {
+        // Skip nodes where text starts with '@' angular 17 uses @ directive e.g. @if @else etc...
+        if (node.rawText.trim().startsWith('@') || node.rawText.trim() === '') {
           return;
         }
 
-        //remove if exists
-        if (node.rawAttrs.includes(`i18n-${attr}`)) {
-          node.rawAttrs = node.rawAttrs.replace(new RegExp(`i18n-${attr}="[^"]*"`), '');
+        const i18nText = stringToi18nTextOrEmpty(node.rawText, CURRENT_FILENAME);
+
+        if (i18nText === '') {
+            return;
         }
-        //remove all spaces after
-        node.rawAttrs = node.rawAttrs.trim();
-        
-        if (node.rawAttrs.endsWith(' ')) {
-          node.rawAttrs += `i18n-${attr}="${text}"`;
+
+        if (node.parentNode.childNodes.length > 1) {
+            const element = HTMLParser.parse(`<ng-container i18n="${i18nText}">${node.rawText}</ng-container>`);
+            node.parentNode.exchangeChild(node, element);
+        } else {
+            node.parentNode.rawAttrs = node.parentNode.rawAttrs.replace(/i18n="[^"]*"/g, '').trim();
+            node.parentNode.rawAttrs = node.parentNode.rawAttrs === '' ? `i18n="${i18nText}"` : `${node.parentNode.rawAttrs} i18n="${i18nText}"`;
         }
-        else {
-          node.rawAttrs += ` i18n-${attr}="${text}"`;
-        }
-      }
-    });
-  }));
-
-
-}
-
-
-function stringToi18nTextOrEmpty(arg1) {
-
-  let text = arg1;
-
-  if (typeof text === undefined) {
-    return '';
+      });
   }
 
-  text = text.replace(/(\r\n|\n|\r)/gm, "");
+  function translateAttributes(document, CURRENT_FILENAME) {
+      document.querySelectorAll('*').forEach(node => {
+          TRANSLATEABLE_ATTRIBUTES.forEach(attr => {
+              const attrToFind = `${attr}=`;
 
-  //remove all {{ }} 
-  text = text.replace(/{{[^}]*}}/g, '').trim();
+              if (node.rawAttrs.includes(attrToFind)) {
+                  const attrString = node.getAttribute(attr);
+                  const text = stringToi18nTextOrEmpty(attrString, CURRENT_FILENAME);
 
-  //remove . ' " - , : ; ? ! ( ) [ ] { } / \ | & * ^ % $ # @ + = ~ `
-  text = text.replace(/[.\-'",:;?!()[\]{}\/\\|&*^%$#@+=~`]/g, '').trim();
+                  if (text === '') {
+                      return;
+                  }
 
-  //text to uppercase
-  text = text.toUpperCase().replace(/ /g, '');
+                  if (node.rawAttrs.includes(`i18n-${attr}`)) {
+                      node.rawAttrs = node.rawAttrs.replace(new RegExp(`i18n-${attr}="[^"]*"`), '');
+                  }
 
-  //get first 20 characters
-  text = text.substring(0, 50);
-
-  if(text === ''){
-    return '';
+                  node.rawAttrs = node.rawAttrs.trim();
+                  node.rawAttrs += node.rawAttrs.endsWith(' ') ? `i18n-${attr}="${text}"` : ` i18n-${attr}="${text}"`;
+              }
+          });
+      });
   }
 
-  return `@@${PREFIX_I18N_NAME}` + CURRENT_FILENAME + "_" + text;
-}
+  function activate(context) {
+      let disposable = vscode.commands.registerCommand('angular-i18n-key-injector.createi18n', function () {
+          const editor = vscode.window.activeTextEditor;
 
-/**
- * @param {vscode.ExtensionContext} context
- */
-function activate(context) {
+          if (!editor) {
+              vscode.window.showErrorMessage("No active text editor found");
+              return;
+          }
 
-  let disposable2 = vscode.commands.registerCommand('angular-i18n-key-injector.createi18n', function() {
+          const filePath = editor.document.fileName;
+          var filenameWithoutExtension = getFileNameWithoutExtension(filePath);
+          const filenameForTranslation = formatFileName(filenameWithoutExtension);
 
-    //set local editor
-    var editor = vscode.window.activeTextEditor;
+          const editorText = editor.document.getText();
+          const document = HTMLParser.parse(editorText);
 
-    setLocalFileName(editor);
+          translateElementTexts(document, filenameForTranslation);
+          translateAttributes(document, filenameForTranslation);
 
-    //editor to text
-    var editorText = editor.document.getText();
+          editor.edit(editBuilder => {
+              const documentAsString = document.toString();
+              editBuilder.replace(new vscode.Range(0, 0, editor.document.lineCount, 0), documentAsString);
+          });
+      });
 
-    var document = HTMLParser.parse(editorText);
+      context.subscriptions.push(disposable);
+  }
 
-    translateElementTexts(document);
+  function deactivate() {}
 
-    translateAttributes(document);
-
-    editor.edit(editBuilder => {
-      editBuilder.replace(new vscode.Range(0, 0, editor.document.lineCount, 0), document.toString());
-    });
-
-  })
-
-  context.subscriptions.push(disposable1);
-  context.subscriptions.push(disposable2);
-}
-
-// This method is called when your extension is deactivated
-function deactivate() {}
-
-module.exports = {
-  activate,
-  deactivate
-}
+  module.exports = {
+      activate,
+      deactivate
+  };

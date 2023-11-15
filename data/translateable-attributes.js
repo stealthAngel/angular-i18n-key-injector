@@ -1,10 +1,11 @@
 // the chosen ones
 module.exports = {
-  translateableAttributes: [  
+  TRANSLATEABLE_ATTRIBUTES: [  
   'placeholder',
   'activity',
   'modus',
   'alt',
   'title',
-]
+  ],
+  PREFIX_I18N_NAME: 'ANGULAR_'
 };

@@ -1,6 +1,6 @@
 {
-  "name": "angular-i18n-translation-key-generator",
-  "displayName": "angular i18n translation key generator",
+  "name": "angular-i18n-key-injector",
+  "displayName": "angular i18n key injector",
   "publisher": "DrunkenWizard",
   "description": "",
   "icon": "images/icon3.png",
@@ -10,6 +10,9 @@
   },
   "categories": [
     "Other"
+  ],
+  "activationEvents": [
+    "onStartupFinished"
   ],
   "main": "./extension.js",
   "contributes": {

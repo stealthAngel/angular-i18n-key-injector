@@ -1,30 +1,49 @@
+# Angular i18n Translation Key Generator
 
+## Overview
 
+Enhance your Angular application's internationalization process with this Visual Studio Code extension that automatically generates i18n translation keys for HTML and TypeScript files.
 
-### createi18n
+## Usage
 
-This package is able to add translation keys to your html page without you needing to write it.
+- **HTML**: Go to your HTMl file, press `F1`, type `createi18nhtml`, and hit `Enter`.
+- **TypeScript**: Select a string or multiple string (e.g. alt + mouse selection) in a TypeScript file, press `F1`, type `createi18nts`, and hit `Enter`.
 
+## Examples
 
-press F1 to open the input field and type createi18n, then hit enter key
+### HTML
 
-The sample changes on your html file will look like the following:
+#### Before:
 
-Before:
-`
-<input placeholder="test">
-<button class="">
-hello world
-</button>`
+```html
+<input placeholder="Enter your name">
+<p>Welcome to our site!</p>
+```
 
-After:
-`
-<input placeholder="test" i18n-placeholder="ANGULAR_FILENAME_TEST">
-<button class="" i18n="@@ANGULAR_FILENAME_HELLOWORLD">
-hello world
-</button>`
-`
+#### After:
 
-Run the script on any HTML page and see the magic.
+```html
+<input placeholder="Enter your name" i18n-placeholder="@@ANGULAR_FILENAME_ENTERYOURNAME">
+<p i18n="@@ANGULAR_FILENAME_WELCOMETOOURSITE">Welcome to our site!</p>
+```
 
-support, questions or needing an update go to: https://github.com/stealthAngel/angular-i18n-key-injector
+### TypeScript
+
+#### Before:
+
+```typescript
+const greeting = "Welcome to our site!";
+const greeting = "`Welcome to our site ${hello}!`";
+```
+
+#### After:
+
+```typescript
+const greeting = $localize`:@@ANGULAR_FILENAME_WELCOMETOOURSITE:Welcome to our site!`;
+$localize`:@@ANGULAR_FILENAME_WELCOMETOOURSITE:Welcome to our site ${hello}!`;
+```
+
+## Support
+
+For questions or updates, visit our [GitHub repository](https://github.com/stealthAngel/angular-i18n-key-injector).
+```

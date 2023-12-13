@@ -1,5 +1,5 @@
 {
-  "name": "angular i18n translation key generator",
+  "name": "angular-i18n-translation-key-generator",
   "displayName": "angular i18n translation key generator",
   "publisher": "DrunkenWizard",
   "description": "",
@@ -11,15 +11,16 @@
   "categories": [
     "Other"
   ],
-  "activationEvents": [
-    "onCommand:angular-i18n-key-injector.createi18n"
-  ],
   "main": "./extension.js",
   "contributes": {
     "commands": [
       {
-        "command": "angular-i18n-key-injector.createi18n",
-        "title": "createi18n"
+        "command": "angular-i18n-key-injector.createi18nhtml",
+        "title": "createi18nhtml"
+      },
+      {
+        "command": "angular-i18n-key-injector.createi18nts",
+        "title": "createi18nts"
       }
     ]
   },

@@ -7,5 +7,6 @@ module.exports = {
   'alt',
   'title',
   ],
-  PREFIX_I18N_NAME: 'ANGULAR_'
+  PREFIX_I18N_NAME: 'ANGULAR',
+  MAX_CONTENT_LENGTH: 50,
 };

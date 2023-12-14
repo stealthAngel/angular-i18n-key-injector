@@ -40,7 +40,7 @@ const greeting = "`Welcome to our site ${hello}!`";
 
 ```typescript
 const greeting = $localize`:@@ANGULAR_FILENAME_WELCOMETOOURSITE:Welcome to our site!`;
-$localize`:@@ANGULAR_FILENAME_WELCOMETOOURSITE:Welcome to our site ${hello}!`;
+const greeting = $localize`:@@ANGULAR_FILENAME_WELCOMETOOURSITE:Welcome to our site ${hello}!`;
 ```
 
 ## Support
